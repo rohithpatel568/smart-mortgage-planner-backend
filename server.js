@@ -1,12 +1,20 @@
 const express = require('express');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Initialize SQLite database with persistent volume path
-const dbPath = process.env.NODE_ENV === 'production' ? '/app/data/loans.db' : './loans.db';
+// Ensure database directory exists
+const dbPath = process.env.NODE_ENV === 'production' ? '/app/data/loans.db' : './data/loans.db';
+const dbDir = path.dirname(dbPath);
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+}
+
+// Initialize SQLite database
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error('Error opening database:', err.message);
